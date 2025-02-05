@@ -81,7 +81,6 @@ export default function SessionLeaderBoard() {
                   <div className="player-avatar">👤</div>
                   <div className="player-info">
                     <span className="player-name">{playerName}</span>
-                    <span className="player-status">Ready</span>
                   </div>
                 </motion.div>
               ))}

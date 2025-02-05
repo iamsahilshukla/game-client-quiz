@@ -33,7 +33,7 @@ export default function GameScreen() {
       setLeaderboard(finalLeaderboard);
       setGameEnded(true);
       // Play audio when game ends
-      const audio = new Audio('/wrong.wav');
+      const audio = new Audio('/loser.wav');
       audio.play().catch(error => console.error("Audio play error:", error));
     });
 
@@ -49,7 +49,7 @@ export default function GameScreen() {
     setSelectedAnswer(answer);
     
     // Play sound effect based on correct/wrong answer
-    const audio = new Audio(answer === currentQuestion.correctAnswer ? '/correct.wav' : '/wrong.wav');
+    const audio = new Audio(answer === currentQuestion.correctAnswer ? '/correct.wav' : '/wrong.mp3');
     audio.play()
       .catch(error => {
         console.error('Error playing sound:', error);
