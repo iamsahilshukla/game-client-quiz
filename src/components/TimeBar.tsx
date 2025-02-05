@@ -27,13 +27,24 @@ const TimerBar: React.FC<TimerBarProps> = ({ duration }) => {
   }, [timeLeft]);
 
   useEffect(() => {
-  }, [timeLeft]);
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => Math.max(0, prev - 0.1));
+    }, 100);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const progress = (timeLeft / duration) * 100;
+  const isEnding = timeLeft <= 5;
 
   return (
     <div className="timer-bar">
-      <div className="timer-bar-inner" style={{ width: `${(timeLeft / duration) * 100}%` }} />
+      <div 
+        className={`timer-progress ${isEnding ? 'ending' : ''}`}
+        style={{ width: `${progress}%` }}
+      />
     </div>
   );
-};
+}
 
 export default TimerBar;

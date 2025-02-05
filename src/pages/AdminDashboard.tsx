@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-import { socket } from '../lib/socket'
 import { createSession, getQuestions, createQuestion, updateQuestion, deleteQuestion } from '../api'
 
 interface Question {
@@ -85,7 +84,7 @@ const handleSelectQuestion = (questionId: string) => {
 
   const handleStartGame = () => {
     if (sessionId) {
-      socket.emit('start_game', JSON.stringify({ roomId: sessionId }))
+      // socket.emit('start_game', JSON.stringify({ roomId: sessionId }))
       navigate(`/leaderboard/${sessionId}`)
     }
   }

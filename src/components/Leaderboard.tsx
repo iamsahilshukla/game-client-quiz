@@ -26,16 +26,11 @@ export default function Leaderboard({ data, className }: LeaderboardProps) {
               <span className={`rank-icon rank-${index}`}>
                 {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
               </span>
-              <span className="player-name">{user.name}</span>
+              <span className="player-name">
+                {user.name} {index === data.length - 1 ? "🐴" : ""}
+              </span>
             </div>
-            <motion.span
-              layout
-              className="player-score"
-              animate={{ scale: 1.2 }}
-              transition={{ duration: 0.2, yoyo: Infinity }}
-            >
-              {user.score}
-            </motion.span>
+            <motion.span className="player-score">{user.score}</motion.span>
           </motion.div>
         ))}
       </AnimatePresence>

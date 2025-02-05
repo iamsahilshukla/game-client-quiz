@@ -5,6 +5,7 @@ import QuestionCard from '../components/QuestionCard';
 import Leaderboard from '../components/Leaderboard';
 import TimerBar from '../components/TimeBar';
 import { Loader2 } from 'lucide-react';
+import confetti from 'canvas-confetti'
 
 export default function GameScreen() {
   const location = useLocation();
@@ -31,6 +32,9 @@ export default function GameScreen() {
     socket.on('game_ended', (finalLeaderboard: any) => {
       setLeaderboard(finalLeaderboard);
       setGameEnded(true);
+      // Play audio when game ends
+      const audio = new Audio('/wrong.wav');
+      audio.play().catch(error => console.error("Audio play error:", error));
     });
 
     return () => {
@@ -43,6 +47,24 @@ export default function GameScreen() {
   const handleAnswer = (answer: string) => {
     if (selectedAnswer) return;
     setSelectedAnswer(answer);
+    
+    // Play sound effect based on correct/wrong answer
+    const audio = new Audio(answer === currentQuestion.correctAnswer ? '/correct.wav' : '/wrong.wav');
+    audio.play()
+      .catch(error => {
+        console.error('Error playing sound:', error);
+        // Continue with the game even if sound fails
+      });
+
+    // Trigger confetti for correct answers
+    if (answer === currentQuestion.correctAnswer) {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
     socket.emit('submit_answer', { roomId, answer });
   };
 
@@ -78,18 +100,39 @@ export default function GameScreen() {
     </div>
   );
 
-  const renderGameEnd = () => (
-    <div className="space-y-6 animate-fade-in">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Game Over!</h2>
-        <p className="text-gray-600 mb-8">Here are the final results</p>
-      </div>
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-semibold text-gray-700 mb-4">Final Leaderboard</h3>
-        <Leaderboard data={leaderboard} className="bg-gray-50 rounded-lg" />
-      </div>
-    </div>
-  );
+  const renderGameEnd = () => {
+      const loser = leaderboard[leaderboard.length - 1];
+      
+      return (
+        <div className="space-y-6 animate-fade-in">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">Game Over!</h2>
+            <p className="text-gray-600 mb-8">Here are the final results</p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-700 mb-4">Final Leaderboard</h3>
+            <Leaderboard data={leaderboard} className="bg-gray-50 rounded-lg" />
+          </div>
+      
+          {loser && (
+            <div className="loser-announcement text-center mt-8">
+              <h3 className="text-2xl font-bold text-accent mb-4">
+                🐴 Today's Donkey: {loser.name} 🐴
+              </h3>
+              <div className="meme-container">
+                <img 
+                  src="/donkey-meme.gif" 
+                  alt="Donkey Meme" 
+                  className="mx-auto rounded-lg shadow-lg"
+                  style={{ maxWidth: '300px' }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
