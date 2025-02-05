@@ -5,6 +5,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import UserJoin from './pages/UserJoin'
 import GameScreen from './pages/GameScreen'
 import './App.css'
+import Leaderboard from './pages/Leaderboard'
 
 export default function App() {
   return (
@@ -15,6 +16,8 @@ export default function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/join" element={<UserJoin />} />
           <Route path="/game" element={<GameScreen />} />
+          <Route path="/leaderboard/:roomId" element={<Leaderboard />} />
+
         </Routes>
       </BrowserRouter>
       <Toaster position="bottom-right" />

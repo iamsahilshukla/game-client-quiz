@@ -1,0 +1,80 @@
+/* General leaderboard container */
+.leaderboard-container {
+    background: rgba(30, 41, 59, 0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(100, 116, 139, 0.5);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Title */
+.leaderboard-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #67e8f9;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Individual leaderboard row */
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    transition: background 0.2s ease-in-out;
+}
+
+.leaderboard-item:hover {
+    background: rgba(51, 65, 85, 0.3);
+}
+
+/* First place special styling */
+.first-place {
+    background: rgba(234, 179, 8, 0.2);
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+}
+
+/* Rank styling */
+.leaderboard-rank {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Top 3 ranks */
+.rank-icon {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.rank-0 {
+    color: gold;
+}
+
+.rank-1 {
+    color: silver;
+}
+
+.rank-2 {
+    color: #cd7f32;
+}
+
+/* Player name */
+.player-name {
+    font-size: 16px;
+    color: white;
+}
+
+/* Player score */
+.player-score {
+    font-size: 16px;
+    font-weight: bold;
+    color: #67e8f9;
+}

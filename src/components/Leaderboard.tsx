@@ -1,17 +1,16 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from "framer-motion";
+import "./leaderboard.css"; // Import the CSS file
 
 interface LeaderboardProps {
-  data: Array<{ name: string; score: number }>
-  className?: string
+  data: Array<{ name: string; score: number }>;
+  className?: string;
 }
 
 export default function Leaderboard({ data, className }: LeaderboardProps) {
   return (
-    <div className={`bg-slate-800/90 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-slate-700/50 ${className}`}>
-      <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-        🏆 Leaderboard
-      </h3>
-      
+    <div className={`leaderboard-container ${className}`}>
+      <h3 className="leaderboard-title">🏆 Leaderboard</h3>
+
       <AnimatePresence>
         {data.sort((a, b) => b.score - a.score).map((user, index) => (
           <motion.div
@@ -20,18 +19,26 @@ export default function Leaderboard({ data, className }: LeaderboardProps) {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex justify-between items-center p-2 hover:bg-slate-700/30 rounded-lg"
+            transition={{ duration: 0.3 }}
+            className={`leaderboard-item ${index === 0 ? "first-place" : ""}`}
           >
-            <div className="flex items-center gap-2">
-              <span className="text-cyan-400">
-                {index === 0 ? '👑' : `#${index + 1}`}
+            <div className="leaderboard-rank">
+              <span className={`rank-icon rank-${index}`}>
+                {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
               </span>
-              {user.name}
+              <span className="player-name">{user.name}</span>
             </div>
-            <span className="text-cyan-400">{user.score}</span>
+            <motion.span
+              layout
+              className="player-score"
+              animate={{ scale: 1.2 }}
+              transition={{ duration: 0.2, yoyo: Infinity }}
+            >
+              {user.score}
+            </motion.span>
           </motion.div>
         ))}
       </AnimatePresence>
     </div>
-  )
+  );
 }

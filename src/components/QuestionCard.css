@@ -1,0 +1,69 @@
+/* Container for the question card */
+.question-card {
+    background-color: rgba(47, 79, 79, 0.5);
+    /* Semi-transparent background */
+    padding: 24px;
+    /* Padding inside the card */
+    border-radius: 12px;
+    /* Rounded corners */
+    border: 1px solid rgba(47, 79, 79, 0.5);
+    /* Border with same color as background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow for depth */
+}
+
+/* Styling for the question text */
+.question-text {
+    font-size: 24px;
+    /* Larger font size */
+    font-weight: bold;
+    /* Bold text */
+    margin-bottom: 24px;
+    /* Space below the question text */
+}
+
+/* Grid layout for the options */
+.options-grid {
+    display: grid;
+    /* Use grid layout */
+    gap: 16px;
+    /* Space between grid items */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /* Responsive columns */
+}
+
+/* Base styling for option buttons */
+.option-button {
+    padding: 16px;
+    /* Padding inside the button */
+    border-radius: 12px;
+    /* Rounded corners */
+    text-align: left;
+    /* Align text to the left */
+    transition: all 0.3s ease;
+    /* Smooth transition for hover effects */
+    background-color: #f0f0f0;
+    /* Light grey background */
+    border: 1px solid #ccc;
+    /* Light grey border */
+}
+
+/* Styling for correct answer */
+.option-button.correct {
+    background-color: #76c7c0;
+    /* Green background for correct answer */
+}
+
+/* Styling for wrong answer */
+.option-button.wrong {
+    background-color: #f08080;
+    /* Red background for wrong answer */
+}
+
+/* Styling for disabled buttons */
+.option-button:disabled {
+    cursor: not-allowed;
+    /* Change cursor to indicate disabled state */
+    opacity: 0.6;
+    /* Reduce opacity for disabled buttons */
+}

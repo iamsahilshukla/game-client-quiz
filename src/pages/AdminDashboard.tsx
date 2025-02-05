@@ -13,6 +13,15 @@ interface Question {
   points: number
 }
 
+const validateQuestion = (question: Question) => {
+  if (!question.text.trim()) return 'Question text is required'
+  if (question.options.some(option => !option.trim())) return 'All options are required'
+  if (!question.options.includes(question.correctAnswer)) return 'Correct answer must match one of the options'
+  if (question.timeLimit < 5) return 'Time limit must be at least 5 seconds'
+  if (question.points <= 0) return 'Points must be greater than 0'
+  return null
+}
+
 export default function AdminDashboard() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([])
@@ -27,26 +36,37 @@ export default function AdminDashboard() {
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const loadQuestions = async () => {
-      try {
-        const fetchedQuestions = await getQuestions()
-        setQuestions(fetchedQuestions)
-      } catch (error) {
-        toast.error('Failed to load questions')
-      }
+const [loading, setLoading] = useState(false)
+
+// Update your useEffect
+useEffect(() => {
+  const loadQuestions = async () => {
+    setLoading(true)
+    try {
+      const fetchedQuestions = await getQuestions()
+      setQuestions(fetchedQuestions)
+    } catch (error) {
+      toast.error('Failed to load questions')
+    } finally {
+      setLoading(false)
     }
-
-    loadQuestions()
-  }, [])
-
-  const handleSelectQuestion = (questionId: string) => {
-    setSelectedQuestions(prev =>
-      prev.includes(questionId)
-        ? prev.filter(id => id !== questionId)
-        : [...prev, questionId]
-    )
   }
+
+  loadQuestions()
+}, [])
+
+const handleSelectQuestion = (questionId: string) => {
+  setSelectedQuestions(prev => {
+    const newSelection = prev.includes(questionId)
+      ? prev.filter(id => id !== questionId)
+      : [...prev, questionId]
+      
+    // Ensure we only keep valid question IDs
+    return newSelection.filter(id => 
+      questions.some(q => q._id === id)
+    )
+  })
+}
 
   const handleCreateSession = async () => {
     if (selectedQuestions.length === 0) {
@@ -66,77 +86,101 @@ export default function AdminDashboard() {
   const handleStartGame = () => {
     if (sessionId) {
       socket.emit('start_game', JSON.stringify({ roomId: sessionId }))
-      navigate(`/game?roomId=${sessionId}&admin=true`)
+      navigate(`/leaderboard/${sessionId}`)
     }
   }
 
-  const handleCreateQuestion = async () => {
-    if (!newQuestion.text || !newQuestion.correctAnswer || newQuestion.options.some(option => !option)) {
-      toast.error('Please fill in all fields')
-      return
-    }
-
-    try {
-      const question = await createQuestion(newQuestion)
-      setQuestions([...questions, question])
-      setNewQuestion({
-        text: '',
-        options: ['', '', '', ''],
-        correctAnswer: '',
-        timeLimit: 30,
-        points: 10,
-      })
-      toast.success('Question created successfully')
-    } catch (error) {
-      toast.error('Failed to create question')
-    }
+const handleCreateQuestion = async () => {
+  const validationError = validateQuestion(newQuestion)
+  if (validationError) {
+    toast.error(validationError)
+    return
   }
 
-  const handleUpdateQuestion = async () => {
-    if (!editingQuestion || !editingQuestion._id) return
+  try {
+    const question = await createQuestion({
+      ...newQuestion,
+      options: newQuestion.options.filter(opt => opt.trim()) // Remove empty options
+    })
+    setQuestions([...questions, question])
+    setNewQuestion({
+      text: '',
+      options: ['', '', '', ''],
+      correctAnswer: '',
+      timeLimit: 30,
+      points: 10,
+    })
+    toast.success('Question created successfully')
+  } catch (error) {
+    toast.error('Failed to create question')
+    console.error('Creation error:', error)
+  }
+}
 
-    try {
-      const updatedQuestion = await updateQuestion(editingQuestion._id, editingQuestion)
-      setQuestions(questions.map(q => (q._id === updatedQuestion._id ? updatedQuestion : q)))
-      setEditingQuestion(null)
-      toast.success('Question updated successfully')
-    } catch (error) {
-      toast.error('Failed to update question')
-    }
+const handleUpdateQuestion = async () => {
+  if (!editingQuestion || !editingQuestion._id) return
+  
+  const validationError = validateQuestion(editingQuestion)
+  if (validationError) {
+    toast.error(validationError)
+    return
   }
 
-  const handleDeleteQuestion = async (questionId: string) => {
-    try {
-      await deleteQuestion(questionId)
-      setQuestions(questions.filter(q => q._id !== questionId))
-      toast.success('Question deleted successfully')
-    } catch (error) {
-      toast.error('Failed to delete question')
-    }
+  try {
+    const updatedQuestion = await updateQuestion(editingQuestion._id, {
+      ...editingQuestion,
+      options: editingQuestion.options.filter(opt => opt.trim())
+    })
+    
+    setQuestions(questions.map(q => 
+      q._id === updatedQuestion._id ? updatedQuestion : q
+    ))
+    setEditingQuestion(null)
+    toast.success('Question updated successfully')
+  } catch (error) {
+    toast.error('Failed to update question')
+    console.error('Update error:', error)
   }
+}
+
+const handleDeleteQuestion = async (questionId: string) => {
+  if (!window.confirm('Are you sure you want to delete this question?')) return
+  
+  try {
+    await deleteQuestion(questionId)
+    setQuestions(questions.filter(q => q._id !== questionId))
+    setSelectedQuestions(prev => prev.filter(id => id !== questionId))
+    toast.success('Question deleted successfully')
+  } catch (error) {
+    toast.error('Failed to delete question')
+    console.error('Deletion error:', error)
+  }
+}
 
   return (
     <div className="container">
       <div className="card">
         <h1>Create Quiz Session</h1>
-        <div className="question-list">
-          {questions.map(question => (
-            <div key={question._id} className="question-item">
-              <input
-                type="checkbox"
-                id={question._id}
-                checked={selectedQuestions.includes(question._id!)}
-                onChange={() => handleSelectQuestion(question._id!)}
-              />
-              <label htmlFor={question._id}>{question.text}</label>
-              <button onClick={() => setEditingQuestion(question)}>Edit</button>
-              <button onClick={() => handleDeleteQuestion(question._id!)}>Delete</button>
-            </div>
-          ))}
-        </div>
-        <button onClick={handleCreateSession} className="button">
-          Create Session
-        </button>
+        {loading ? (
+          <div className="loading">Loading questions...</div>
+        ) : (
+          <><div className="question-list">
+            {questions.map(question => (
+              <div key={question._id} className="question-item">
+                <input
+                  type="checkbox"
+                  id={question._id}
+                  checked={selectedQuestions.includes(question._id!)}
+                  onChange={() => handleSelectQuestion(question._id!)} />
+                <label htmlFor={question._id}>{question.text}</label>
+                <button onClick={() => setEditingQuestion(question)}>Edit</button>
+                <button onClick={() => handleDeleteQuestion(question._id!)}>Delete</button>
+              </div>
+            ))}
+          </div><button onClick={handleCreateSession} className="button">
+              Create Session
+            </button></>
+        )}
 
         {sessionId && (
           <div className="session-info">

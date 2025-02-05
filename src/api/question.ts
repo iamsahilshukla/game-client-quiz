@@ -7,7 +7,7 @@ export interface Question {
   points: number;
 }
 
-const API_URL = 'https://donkeyquizgame.onrender.com/api';
+const API_URL = 'http://localhost:9000/api';
 
 export const getQuestions = async (): Promise<Question[]> => {
   const response = await fetch(`${API_URL}/admin/questions`);
@@ -20,7 +20,18 @@ export const createQuestion = async (question: Partial<Question>) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(question),
   });
-  return response.json();
+
+  if (response.status === 201) {
+    return response.json();
+  } else if (response.status === 400) {
+    const errorData = await response.json();
+    const errorMessage = errorData.details.issues
+      .map((issue: any) => `${issue.path.join('.')} - ${issue.message}`)
+      .join(', ');
+    throw new Error(`Validation failed: ${errorMessage}`);
+  } else {
+    throw new Error(`Failed to create question: ${response.statusText}`);
+  }
 };
 
 export const updateQuestion = async (

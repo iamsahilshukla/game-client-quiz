@@ -16,7 +16,7 @@ export default function UserJoin() {
 
   useEffect(() => {
     socket.on('session_joined', () => {
-    navigate(`/game?roomId=${roomId}&username=${username}`)
+    navigate(`/game?roomId=${roomId}`)
     })
 
     socket.on('new_question', (question: Question) => {

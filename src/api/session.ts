@@ -3,7 +3,7 @@ export interface Session {
   questions: any[];
 }
 
-const API_URL = 'https://donkeyquizgame.onrender.com/api';
+const API_URL = 'http://localhost:9000/api';
 
 export const createSession = async (
   questionIds: string[]

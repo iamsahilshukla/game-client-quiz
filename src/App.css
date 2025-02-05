@@ -332,86 +332,6 @@ body {
   margin-top: 48px;
 }
 
-/* Quiz components */
-.question-card {
-  position: relative;
-  margin-bottom: 24px;
-}
-
-.question-text {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 24px;
-}
-
-.options-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.option-button {
-  width: 100%;
-  padding: 16px;
-  text-align: left;
-  background-color: var(--background-dark);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  color: var(--text-light);
-  transition: background-color 0.2s;
-}
-
-.option-button:hover:not(:disabled) {
-  background-color: var(--background-light);
-}
-
-.option-button.selected {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-/* Leaderboard */
-.leaderboard {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.leaderboard-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.leaderboard-rank {
-  font-weight: bold;
-  color: var(--primary-color);
-}
-
-/* Timer */
-.timer-bar {
-  height: 4px;
-  background-color: var(--primary-color);
-  border-radius: 2px;
-  transition: width 1s linear;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .hero-title {
-    font-size: 48px;
-  }
-
-  .button {
-    width: 100%;
-    margin-bottom: 12px;
-  }
-
-  .card {
-    padding: 16px;
-  }
-}
-
 /* Button container specific styles */
 .button-group {
   display: flex;
@@ -449,10 +369,12 @@ body {
 
 .button.primary {
   background: var(--gradient-primary);
+  margin : 8px
 }
 
 .button.secondary {
   background: var(--gradient-secondary);
+    margin: 8px
 }
 
 /* Responsive adjustments */
@@ -467,4 +389,35 @@ body {
     width: 100%;
     min-width: unset;
   }
+}
+
+.timer-bar {
+  width: 100%;
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.timer-bar-inner {
+  height: 100%;
+  background-color: #7824e0;
+  transition: width 1s linear;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
 }
