@@ -7,7 +7,7 @@ export interface Question {
   points: number;
 }
 
-const API_URL = 'http://localhost:9000/api';
+const API_URL = 'https://donkeyquizgame.onrender.com/api';
 
 export const getQuestions = async (): Promise<Question[]> => {
   const response = await fetch(`${API_URL}/admin/questions`);
