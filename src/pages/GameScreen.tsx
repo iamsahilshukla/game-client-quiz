@@ -8,6 +8,11 @@ import { Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti'
 import Chat from '../components/Chat';
 
+export interface LeaderboardEntry {
+  name: string;
+  score: number;
+}
+
 export default function GameScreen() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -27,14 +32,34 @@ export default function GameScreen() {
       setQuestionStartTime(Date.now());
     });
 
-    socket.on('leaderboard_update', (updatedLeaderboard: any) => {
-      setLeaderboard(updatedLeaderboard);
+    socket.on('leaderboard_update', (updatedLeaderboard: LeaderboardEntry[]) => {
+      // Filter unique players by name and keep the highest score
+      const uniqueLeaderboard : LeaderboardEntry []= Object.values(
+        updatedLeaderboard.reduce((acc: any, curr: any) => {
+          if (!acc[curr.name] || acc[curr.name].score < curr.score) {
+            acc[curr.name] = curr;
+          }
+          return acc;
+        }, {})
+      );
+
+      // Sort by score in descending order
+      setLeaderboard(uniqueLeaderboard.sort((a: any, b: any) => b.score - a.score));
     });
 
-    socket.on('game_ended', (finalLeaderboard: any) => {
-      setLeaderboard(finalLeaderboard);
+    socket.on('game_ended', (finalLeaderboard: LeaderboardEntry[]) => {
+      // Apply same unique filtering for final scores
+      const uniqueFinalLeaderboard :LeaderboardEntry[]= Object.values(
+        finalLeaderboard.reduce((acc: any, curr: any) => {
+          if (!acc[curr.name] || acc[curr.name].score < curr.score) {
+            acc[curr.name] = curr;
+          }
+          return acc;
+        }, {})
+      );
+
+      setLeaderboard(uniqueFinalLeaderboard.sort((a: any, b: any) => b.score - a.score));
       setGameEnded(true);
-      // Play audio when game ends
       const audio = new Audio('/loser.wav');
       audio.play().catch(error => console.error("Audio play error:", error));
     });
