@@ -14,7 +14,7 @@ export default function UserJoin() {
 
     socket.emit('join_session', JSON.stringify({ roomId, username }))
     socket.on('session_joined', () => {
-      navigate(`/game?roomId=${roomId}`);
+      navigate(`/game?roomId=${roomId}&playerName=${username}`);
     });
   };
 

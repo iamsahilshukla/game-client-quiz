@@ -6,11 +6,13 @@ import Leaderboard from '../components/Leaderboard';
 import TimerBar from '../components/TimeBar';
 import { Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti'
+import Chat from '../components/Chat';
 
 export default function GameScreen() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const roomId = params.get('roomId')!;
+  const playerName = params.get('playerName')!; // Add this line to get playerName from URL
 
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
   const [leaderboard, setLeaderboard] = useState<Array<{ name: string; score: number }>>([]);
@@ -135,14 +137,12 @@ export default function GameScreen() {
     };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-6">
-          {!currentQuestion && !gameEnded && renderWaitingScreen()}
-          {currentQuestion && !gameEnded && renderGameContent()}
-          {gameEnded && renderGameEnd()}
-        </div>
-      </div>
+    <div className="game-container">
+      {!currentQuestion && !gameEnded && renderWaitingScreen()}
+      {currentQuestion && !gameEnded && renderGameContent()}
+      {gameEnded && renderGameEnd()}
+      
+      <Chat roomId={roomId} username={playerName} /> {/* Update to use username prop */}
     </div>
   );
 }
