@@ -11,10 +11,15 @@ interface PlayerScore {
   score: number
 }
 
+interface Participant{
+  socketId: string;
+  name:string
+}
+
 export default function SessionLeaderBoard() {
   const { roomId } = useParams()
   const [leaderboard, setScores] = useState<PlayerScore[]>([])
-  const [players, setPlayers] = useState<string[]>([])
+  const [players, setPlayers] = useState<Participant[]>([])
   const[gameEnded,setGameEnded] = useState(false)
 
   const handleStartGame = () => {
@@ -22,10 +27,13 @@ export default function SessionLeaderBoard() {
   };
 
   useEffect(() => {
-    socket.on('participant_joined', (player: any) => {
-      console.log("------------>session joined", player.name);
-      setPlayers(prev => [...prev, player.name])
+    socket.on('participant_joined', (player: Participant) => {
+      setPlayers(prev => [...prev, player])
     })
+
+    socket.on('participant_left', (socketId: string) => {
+      setPlayers(prev => prev.filter(item => socketId !== item.socketId));
+    });
 
     socket.on('leaderboard_update', (newScores: any) => {
       setScores(newScores)
@@ -39,6 +47,7 @@ export default function SessionLeaderBoard() {
 
     return () => {
       socket.off('participant_joined')
+      socket.off('participant_left')
       socket.off('leaderboard_update')
       socket.off('game_ended')
     }
@@ -70,7 +79,7 @@ export default function SessionLeaderBoard() {
           <div className="players-grid mb-8">
             <h2 className="text-xl font-semibold mb-4">Players Joined ({players.length})</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {players.map((playerName, index) => (
+              {players.map(({name:playerName}, index) => (
                 <motion.div
                   key={playerName}
                   className="player-card"
